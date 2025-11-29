@@ -6,6 +6,8 @@ sidebar_position: 1
 
 Let's discover **Docusaurus in less than 5 minutes**.
 
+This line is added to test automated deployments.
+
 ## Getting Started
 
 Get started by **creating a new site**.

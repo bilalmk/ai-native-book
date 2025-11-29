@@ -1,0 +1,49 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="#f9fafb"/>
+
+  <!-- Traditional AI Section -->
+  <g transform="translate(50, 50)">
+    <rect x="0" y="0" width="300" height="300" fill="#ffffff" stroke="#e5e7eb" stroke-width="2" rx="8"/>
+    <text x="150" y="40" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle">Traditional AI</text>
+    <text x="150" y="70" font-family="sans-serif" font-size="14" fill="#6b7280" text-anchor="middle">Operates in Digital Worlds</text>
+
+    <!-- Icons and Text -->
+    <text x="60" y="120" font-family="sans-serif" font-size="16">📊</text>
+    <text x="85" y="120" font-family="sans-serif" font-size="16">Data & Algorithms</text>
+
+    <text x="60" y="170" font-family="sans-serif" font-size="16">💻</text>
+    <text x="85" y="170" font-family="sans-serif" font-size="16">Simulation & Models</text>
+
+    <text x="60" y="220" font-family="sans-serif" font-size="16">🧠</text>
+    <text x="85" y="220" font-family="sans-serif" font-size="16">Disembodied Intelligence</text>
+
+    <path d="M 50 250 Q 150 230 250 250" stroke="#d1d5db" stroke-width="2" fill="none" />
+    <text x="150" y="270" font-family="sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">Environment is abstract</text>
+  </g>
+
+  <!-- Physical AI Section -->
+  <g transform="translate(450, 50)">
+    <rect x="0" y="0" width="300" height="300" fill="#ffffff" stroke="#e5e7eb" stroke-width="2" rx="8"/>
+    <text x="150" y="40" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle">Physical AI</text>
+    <text x="150" y="70" font-family="sans-serif" font-size="14" fill="#6b7280" text-anchor="middle">Operates in the Real World</text>
+
+    <!-- Icons and Text -->
+    <text x="60" y="120" font-family="sans-serif" font-size="16">🤖</text>
+    <text x="85" y="120" font-family="sans-serif" font-size="16">Sensors & Actuators</text>
+
+    <text x="60" y="170" font-family="sans-serif" font-size="16">🌍</text>
+    <text x="85" y="170" font-family="sans-serif" font-size="16">Physics & Environment</text>
+
+    <text x="60" y="220" font-family="sans-serif" font-size="16">🦾</text>
+    <text x="85" y="220" font-family="sans-serif" font-size="16">Embodied Intelligence</text>
+
+    <path d="M 50 250 C 100 280, 200 280, 250 250" stroke="#3b82f6" stroke-width="2" fill="none" />
+    <text x="150" y="270" font-family="sans-serif" font-size="12" fill="#6b7280" text-anchor="middle">Environment is physical</text>
+  </g>
+
+  <!-- Arrow -->
+  <g transform="translate(375, 200)">
+    <path d="M 0 -20 L 50 0 L 0 20" fill="none" stroke="#9ca3af" stroke-width="3"/>
+  </g>
+</svg>
