@@ -18,7 +18,7 @@ const sidebars: SidebarsConfig = {
     {
       type: "doc",
       id: "physical-ai/index",
-      label: "Physical AI & Humanoid Robotics",
+      label: "Introduction",
     },
   ],
 };

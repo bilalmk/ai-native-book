@@ -189,11 +189,11 @@ description: "Task list for Physical AI & Humanoid Robotics Book Introduction"
 
 **Purpose**: Deploy to GitHub Pages and prepare for student feedback collection
 
-- [ ] T060 Use docusaurus-deployment skill to deploy site to GitHub Pages
-- [ ] T061 Verify deployment successful and accessible via GitHub Pages URL
-- [ ] T062 Create author guide for future updates in specs/004-physical-ai-intro/quickstart.md
-- [ ] T063 Document post-publication metrics collection plan (comprehension assessment, engagement survey, time tracking) in specs/004-physical-ai-intro/validation-results.md
-- [ ] T064 Set up feedback collection mechanism (survey or LMS integration) for first student cohort
+- [X] T060 Use docusaurus-deployment skill to deploy site to GitHub Pages
+- [X] T061 Verify deployment successful and accessible via GitHub Pages URL
+- [X] T062 Create author guide for future updates in specs/004-physical-ai-intro/quickstart.md
+- [X] T063 Document post-publication metrics collection plan (comprehension assessment, engagement survey, time tracking) in specs/004-physical-ai-intro/validation-results.md
+- [X] T064 Set up feedback collection mechanism (survey or LMS integration) for first student cohort
 
 ---
 
