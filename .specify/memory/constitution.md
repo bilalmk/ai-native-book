@@ -69,7 +69,7 @@ The textbook will adopt a clear, accessible, and practical tone. It should be en
     *   **Relational Database:** Neon Serverless Postgres.
 4.  **Code Quality:** All code contributions must adhere to established best practices, including readability, modularity, and proper error handling.
 
-### Learning Objectives
+<!--### Learning Objectives
 
 The textbook will cover the following key learning objectives, enabling students to:
 
@@ -115,7 +115,7 @@ The textbook will cover the following key learning objectives, enabling students
 8.  **Capstone Requirements**
     *   Build an autonomous humanoid robot simulation.
     *   Process voice commands → LLM planning → ROS 2 action execution.
-    *   Navigate, perceive objects, and manipulate them end-to-end.
+    *   Navigate, perceive objects, and manipulate them end-to-end.-->
 
 ### Ethical Considerations
 
