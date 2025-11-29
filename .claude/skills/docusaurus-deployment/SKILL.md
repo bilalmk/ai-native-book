@@ -136,7 +136,9 @@ The skill will return:
 2.  **Configuration Details**: A checklist of changes made to `docusaurus.config.js` and `sidebars.js`.
 3.  **Confirmation Deploy.yml**: Confirmation of whether `.github/workflows/deploy.yml` already existed or was created.
 4.  **CI/CD Instructions**: A ready-to-commit `deploy.yml` workflow for GitHub Actions and notes on enabling GitHub Pages.
-5.  **Next Steps**: How to add content to the `docs` or `blog` folders and verify deployment.
+5.  **Next Steps**: 
+  - First find the Docusaurus project folder `cd <project_folder_name>` 
+  - How to add content to the `docs` or `blog` folders inside Docusaurus project and verify deployment.
 
 ## Example
 

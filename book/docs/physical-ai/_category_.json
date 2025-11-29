@@ -1,0 +1,8 @@
+{
+  "label": "Physical AI & Humanoid Robotics",
+  "position": 2,
+  "link": {
+    "type": "generated-index",
+    "description": "Learn about Physical AI systems that operate in and comprehend the physical world, and how to design, simulate, and deploy humanoid robots."
+  }
+}

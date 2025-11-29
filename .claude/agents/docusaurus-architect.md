@@ -310,10 +310,11 @@ npm run start
 **Success criteria** : Server starts in under 2 minutes
 
 ### Make Content Changes
-1. Edit files in `docs/` directory
-2. Save changes
-3. Browser automatically reloads
-4. Verify changes appear correctly
+1. First find the Docusaurus project folder `cd <project_folder_name>`
+2. Edit files in `docs/` directory
+3. Save changes
+4. Browser automatically reloads
+5. Verify changes appear correctly
 
 ### Stop Development Server
 Press `Ctrl+C` in the terminal
@@ -401,8 +402,9 @@ GIT_USER=[your-username] npm run deploy
 ## Common Development Tasks
 
 ### Add New Documentation Page
-1. Create file in `docs/`: `docs/new-page.md`
-2. Add front matter:
+1. First find the Docusaurus project folder `cd <project_folder_name>`
+2. Create file in `docs/`: `docs/new-page.md`
+3. Add front matter:
    ```markdown
    ---
    id: new-page
@@ -412,8 +414,8 @@ GIT_USER=[your-username] npm run deploy
 
    # New Page Content
    ```
-3. Page automatically appears in sidebar
-4. Test with `npm run start`
+4. Page automatically appears in sidebar
+5. Test with `npm run start`
 
 ### Update Site Configuration
 1. Edit `docusaurus.config.js`
