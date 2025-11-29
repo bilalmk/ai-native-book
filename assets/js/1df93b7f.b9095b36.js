@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkbook=globalThis.webpackChunkbook||[]).push([[4583],{6866:(o,a,i)=>{i.r(a),i.d(a,{default:()=>k});i(6540);var s=i(6347),b=i(4848);function k(){return(0,b.jsx)(s.rd,{to:"/ai-native-book/docs/physical-ai"})}}}]);
