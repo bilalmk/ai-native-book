@@ -1,0 +1,51 @@
+---
+id: 04-sensor-systems
+title: Sensor Systems for Humanoid Robotics
+sidebar_label: Sensor Systems
+description: An overview of the sensor systems that enable humanoid robots to perceive and interact with the physical world.
+draft: false
+---
+
+## Learning Objectives
+
+By the end of this section, you will be able to:
+-   Categorize the primary types of sensors used in humanoid robotics.
+-   Explain the function of proprioceptive sensors in motor control.
+-   Describe the role of exteroceptive sensors in environmental perception.
+-   Understand the concept of sensor fusion and its importance.
+
+## The Robotic Nervous System
+
+Sensor systems are the perceptual foundation of a humanoid robot, equivalent to a biological nervous system. They provide the raw data that AI models use to understand the robot's internal state and the external environment. Without accurate and reliable sensing, even the most advanced algorithms are ineffective.
+
+The design and integration of these systems are critical, as they directly influence the robot's ability to perform tasks safely, efficiently, and with awareness of its surroundings.
+
+## Proprioceptive Sensors: The Sense of Self
+
+Proprioception is the robot's awareness of its own body's position, orientation, and movement. These sensors are essential for stable locomotion, balance, and precise manipulation.
+
+[Diagram: A schematic of a humanoid robot, highlighting the locations of various proprioceptive sensors.]
+
+### Key Proprioceptive Sensors
+-   **Inertial Measurement Units (IMUs)**: These devices, typically combining accelerometers and gyroscopes, measure the orientation and angular velocity of the robot's torso and limbs. They are fundamental for maintaining balance.
+-   **Joint Encoders**: Located at each joint, encoders measure the precise angle or position of the robot's limbs. This data is critical for kinematic calculations and ensuring the robot knows its own posture.
+-   **Force/Torque Sensors**: These sensors measure the forces and torques exerted on the robot's joints or end-effectors (like hands or feet). They are vital for tasks requiring delicate force control, such as grasping objects or walking on uneven terrain.
+
+## Exteroceptive Sensors: The Sense of the World
+
+Exteroception is the robot's ability to perceive the external environment. These sensors allow the robot to see, hear, and "feel" the world around it, enabling navigation, object recognition, and interaction.
+
+### Common Exteroceptive Systems
+-   **Vision Systems (Cameras)**: Provide rich, high-dimensional data about the environment. Humanoid robots often use stereo cameras to perceive depth, mimicking human binocular vision.
+-   **LiDAR (Light Detection and Ranging)**: Creates a 3D point cloud of the surroundings by measuring distances with laser light. It is highly effective for accurate mapping and obstacle avoidance.
+-   **Tactile Sensors**: Skin-like sensors on a robot's hands or body that detect contact, pressure, and texture. They are crucial for fine-grained manipulation and safe human-robot interaction.
+
+[Illustration: A comparison of the data output from a camera (2D image) versus a LiDAR sensor (3D point cloud).]
+
+## Sensor Fusion: Creating a Coherent Picture
+
+No single sensor is sufficient for robust perception. Sensor fusion is the process of combining data from multiple sensors to create a more accurate, complete, and reliable understanding of the environment and the robot's state than any single sensor could provide alone.
+
+[Example: Fusing IMU data with foot-contact sensor data to reliably determine if a bipedal robot is stable or beginning to fall.]
+
+This process often involves probabilistic techniques to manage uncertainty and noise inherent in sensor readings. A well-implemented fusion architecture is a hallmark of an advanced robotic system.
