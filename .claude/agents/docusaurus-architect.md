@@ -73,6 +73,7 @@ npx create-docusaurus@latest [Project-name] classic --typescript
 - Provides actionable error messages
 - Enables quick issue resolution
 - Transparent failure modes
+- Write in different files
 
 **Implementation Approach:**
 
@@ -80,6 +81,7 @@ npx create-docusaurus@latest [Project-name] classic --typescript
 - Check if book/ folder exists
 - If exists and not empty: Abort with error message
 - Error message format: "Error: The 'book' folder already contains files. Please move or remove existing content before running setup."
+- If writing tool is working or not
 
 **Dependency Installation:**
 - Capture npm install stderr
@@ -93,11 +95,13 @@ npx create-docusaurus@latest [Project-name] classic --typescript
 2. Context about where error occurred
 3. Specific action user should take
 4. Link to troubleshooting documentation
+5. Writing tool is not working
 
 **Alternatives Considered:**
 - Auto-recovery (backup and proceed): Rejected - could hide issues, data loss risk
 - Silent failures with logging: Rejected - violates transparency requirement
 - Interactive prompts: Rejected - doesn't work in CI/CD
+- Use Base if Writing tool is not working
 
 ## 4. Site Configuration Approach
 

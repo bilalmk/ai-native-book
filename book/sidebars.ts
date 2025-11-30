@@ -43,6 +43,20 @@ const sidebars: SidebarsConfig = {
         "ros2-fundamentals/launch-files-parameter-management",
       ],
     },
+    {
+      type: "category",
+      label: "Robot Simulation with Gazebo",
+      link: {
+        type: "doc",
+        id: "robot-simulation-gazebo/index",
+      },
+      items: [
+        "robot-simulation-gazebo/gazebo-setup",
+        "robot-simulation-gazebo/urdf-sdf",
+        "robot-simulation-gazebo/physics-sensors",
+        "robot-simulation-gazebo/unity-visualization",
+      ],
+    },
   ],
 };
 
