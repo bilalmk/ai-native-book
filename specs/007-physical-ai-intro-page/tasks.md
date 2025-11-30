@@ -46,7 +46,7 @@ description: "Task list for feature implementation"
 
 **Purpose**: Final deployment of the new content.
 
-- [ ] T007 Use the `docusaurus-deployment` skill to deploy the updated site to GitHub Pages.
+- [x] T007 Use the `docusaurus-deployment` skill to deploy the updated site to GitHub Pages.
 
 ---
 
