@@ -57,6 +57,20 @@ const sidebars: SidebarsConfig = {
         "robot-simulation-gazebo/unity-visualization",
       ],
     },
+    {
+      type: "category",
+      label: "NVIDIA Isaac Platform",
+      link: {
+        type: "doc",
+        id: "nvidia-isaac-platform/index",
+      },
+      items: [
+        'nvidia-isaac-platform/isaac-sdk-and-sim',
+        'nvidia-isaac-platform/ai-perception-manipulation',
+        'nvidia-isaac-platform/reinforcement-learning',
+        'nvidia-isaac-platform/sim-to-real-transfer',
+      ],
+    },
   ],
 };
 
