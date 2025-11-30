@@ -53,7 +53,7 @@ description: "Task list for Robot Simulation with Gazebo feature"
 **Purpose**: Improvements that affect multiple user stories
 
 - [X] T013 Build the Docusaurus site to verify the changes.
-- [ ] T014 Deploy the updated Docusaurus site.
+- [X] T014 Deploy the updated Docusaurus site.
 
 ---
 
