@@ -21,7 +21,13 @@ const sidebars: SidebarsConfig = {
         type: "doc",
         id: "physical-ai/index",
       },
-      items: ["physical-ai/physical-ai-introduction"],
+      items: [
+        "physical-ai/physical-ai-introduction",
+        "physical-ai/foundations-of-physical-ai",
+        "physical-ai/from-digital-ai-to-robots",
+        "physical-ai/humanoid-robotics-landscape",
+        "physical-ai/sensor-systems",
+      ],
     },
   ],
 };
