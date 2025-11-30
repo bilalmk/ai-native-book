@@ -30,7 +30,7 @@
 **Purpose**: Verify the build and deploy the site.
 
 - [X] T005 Run a local Docusaurus build to ensure the new page and sidebar changes render correctly.
-- [ ] T006 Use the `docusaurus-deployment` skill to deploy the updated site to GitHub Pages.
+- [X] T006 Use the `docusaurus-deployment` skill to deploy the updated site to GitHub Pages.
 
 ---
 

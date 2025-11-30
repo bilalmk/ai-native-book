@@ -1,0 +1,116 @@
+---
+sidebar_label: 'Sensor Systems'
+---
+
+# Sensor Systems: Perceiving the World
+
+A robot's ability to perform tasks in the physical world is fundamentally limited by its ability to perceive its environment and its own state. Sensors provide the raw data that perception algorithms use to build a coherent world model. This section introduces the core sensor technologies that enable modern robotics.
+
+### Learning Objectives
+
+After completing this section, you will be able to:
+
+-   Understand the function of key sensor modalities in robotics.
+-   Differentiate between proprioceptive and exteroceptive sensors.
+-   Explain the high-level principles of LiDAR, cameras, IMUs, and force/torque sensors.
+-   Recognize the primary applications and conceptual limitations of each sensor type.
+
+---
+
+## The Role of Perception
+
+Perception is the process of turning raw sensor data into a meaningful understanding of the robot's state and its environment. We can broadly categorize sensors into two main types:
+
+-   **Exteroceptive Sensors**: These sensors measure properties of the external world. They are the robot's "senses" and include technologies like cameras and LiDAR that perceive objects, distances, and surfaces.
+-   **Proprioceptive Sensors**: These sensors measure the internal state of the robot itself. Examples include motor encoders that track joint angles and IMUs that measure orientation and acceleration.
+
+A robust robotic system integrates data from both types to build a comprehensive model for decision-making.
+
+[Diagram: A humanoid robot with labels pointing to different sensors. Exteroceptive sensors like cameras in the head and LiDAR on the torso are contrasted with proprioceptive sensors like joint encoders in the limbs.]
+
+---
+
+## LiDAR (Light Detection and Ranging)
+
+LiDAR is an active sensing method that illuminates the environment with laser beams and measures the reflected light. It is a cornerstone technology for tasks requiring precise distance measurements and 3D mapping.
+
+### Operating Principle
+
+A LiDAR unit emits pulses of laser light and measures the time it takes for these pulses to return after hitting an object. By knowing the speed of light, it calculates the precise distance to that object. By rapidly scanning beams in multiple directions, a LiDAR sensor can generate a dense "point cloud" representing the 3D structure of its surroundings.
+
+[Illustration: A diagram showing a LiDAR sensor emitting a laser pulse, the pulse reflecting off an object, and returning to the sensor. The concept of "time-of-flight" is highlighted.]
+
+### Applications
+
+-   **Mapping and Localization**: Creating detailed 3D maps of an environment and determining the robot's position within them (SLAM).
+-   **Obstacle Detection**: Identifying and avoiding obstacles with high precision, critical for autonomous navigation.
+-   **Object Recognition**: Classifying objects based on their geometric shape and size from the point cloud data.
+
+[Example: An autonomous vehicle's LiDAR point cloud showing the 3D geometry of a street scene, including other cars, pedestrians, and buildings.]
+
+---
+
+## Cameras (Vision Systems)
+
+Cameras are passive sensors that capture light from the environment to form an image, providing rich, dense information about the world. Vision is one of the most powerful sensing modalities for robots, enabling a wide range of intelligent behaviors.
+
+### Types of Robotic Cameras
+
+1.  **Monocular Cameras**: A single camera that provides a 2D projection of the 3D world. Inferring depth is challenging but can be estimated using cues and motion.
+2.  **Stereo Cameras**: Two cameras separated by a known distance, mimicking human binocular vision. By comparing the two images, depth can be calculated through triangulation.
+3.  **RGB-D Cameras**: These cameras provide a standard color (RGB) image plus a per-pixel depth (D) map. This is often achieved using structured light or time-of-flight principles.
+
+[Illustration: A comparison of outputs from a mono camera (2D image), a stereo camera (showing disparity), and an RGB-D camera (a color image and a corresponding depth map).]
+
+### Core Concepts
+
+Robotic vision relies on processing pixel data to extract higher-level information. This includes identifying keypoints, detecting edges, segmenting objects from the background, and ultimately recognizing what those objects are.
+
+### Applications
+
+-   **Object Recognition and Tracking**: Identifying and following specific objects or people.
+-   **Scene Understanding**: Interpreting the broader context of an environment, such as identifying a room as a "kitchen."
+-   **Visual Servoing**: Using visual feedback to guide a robot's motion, such as aligning a gripper with an object.
+
+---
+
+## Inertial Measurement Units (IMUs)
+
+An IMU is a proprioceptive sensor that measures a robot's orientation, angular velocity, and linear acceleration. It is crucial for stabilizing a robot and tracking its motion, especially for dynamic systems like humanoids and drones.
+
+### Components and Principles
+
+An IMU typically combines two types of sensors:
+
+-   **Accelerometers**: Measure linear acceleration, including the constant pull of gravity.
+-   **Gyroscopes**: Measure angular velocity or the rate of rotation.
+
+By integrating data from these components, an IMU can estimate the robot's orientation (roll, pitch, yaw) relative to a starting position.
+
+[Diagram: An exploded view of an IMU, showing the tiny MEMS structures of an accelerometer and a gyroscope.]
+
+### Applications
+
+-   **State Estimation**: Providing a high-frequency estimate of the robot's orientation for balancing and stabilization.
+-   **Dead Reckoning**: Estimating the robot's position by integrating acceleration over time, though this is prone to drift.
+-   **Sensor Fusion**: Fusing IMU data with other sensors (like cameras or GPS) to create a more accurate and robust estimate of the robot's state.
+
+---
+
+## Force/Torque Sensors
+
+Force/Torque (F/T) sensors provide a robot with a sense of touch and interaction force. They measure the forces and torques applied to a robot's structure, enabling delicate and controlled physical interaction with the environment.
+
+### Operating Principle
+
+F/T sensors are typically mounted in a robot's wrists, joints, or fingertips. They are built with strain gauges that deform under load. This deformation changes their electrical resistance, which is measured and converted into force and torque values along multiple axes.
+
+[Illustration: A cross-section of a multi-axis force/torque sensor, showing the placement of strain gauges to measure forces and torques in different directions.]
+
+### Applications in Robotics
+
+-   **Force-Compliant Motion**: Allowing a robot to "feel" its way through a task, such as inserting a peg into a hole.
+-   **Safe Human-Robot Interaction**: Detecting unexpected contact and stopping or reducing force to ensure safety.
+-   **Grasping Control**: Measuring grip force to hold an object securely without crushing it.
+
+[Example: A robotic arm uses a wrist-mounted F/T sensor to smoothly trace a surface while maintaining a constant contact force.]
