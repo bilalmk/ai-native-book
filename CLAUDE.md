@@ -208,3 +208,10 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Markdown/MDX, React (for Docusaurus components) + Docusaurus (existing) (005-physical-ai-intro-module)
+- File system (Git) (005-physical-ai-intro-module)
+
+## Recent Changes
+- 005-physical-ai-intro-module: Added Markdown/MDX, React (for Docusaurus components) + Docusaurus (existing)
