@@ -14,11 +14,14 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
  */
 const sidebars: SidebarsConfig = {
   tutorialSidebar: [
-    //"intro",
     {
-      type: "doc",
-      id: "physical-ai/index",
-      label: "Introduction",
+      type: "category",
+      label: "Physical AI",
+      link: {
+        type: "doc",
+        id: "physical-ai/index",
+      },
+      items: ["physical-ai/physical-ai-introduction"],
     },
   ],
 };

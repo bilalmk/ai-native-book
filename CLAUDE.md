@@ -208,3 +208,10 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Markdown/MDX with React components in a Docusaurus (TypeScript) environment. + Docusaurus, React, `robotics-course-writer` agent, `docusaurus-architect` agent, `docusaurus-deployment` skill. (006-physical-ai-intro-page)
+- N/A (content is stored as files in the Git repository). (006-physical-ai-intro-page)
+
+## Recent Changes
+- 006-physical-ai-intro-page: Added Markdown/MDX with React components in a Docusaurus (TypeScript) environment. + Docusaurus, React, `robotics-course-writer` agent, `docusaurus-architect` agent, `docusaurus-deployment` skill.
