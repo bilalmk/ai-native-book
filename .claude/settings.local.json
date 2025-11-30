@@ -1,10 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-docusaurus@latest:*)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
-      "Bash(.specify/scripts/bash/create-phr.sh:*)",
-      "Bash(rm:*)"
+      "Bash(npx create-docusaurus@latest:*)"
     ],
     "deny": [],
     "ask": []
