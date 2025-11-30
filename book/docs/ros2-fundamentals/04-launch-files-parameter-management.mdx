@@ -1,0 +1,102 @@
+---
+title: Launch Files and Parameter Management
+sidebar_label: Launch Files & Parameters
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Launch Files and Parameter Management
+
+As robotic systems grow in complexity, managing the startup and configuration of multiple nodes becomes a critical challenge. ROS 2 provides a powerful mechanism to handle this: the launch system. This section delves into using launch files to orchestrate multi-node systems and manage their configurations through parameters.
+
+### Learning Objectives
+
+By the end of this section, you will be able to:
+
+-   Understand the role of launch files in orchestrating complex robotic systems.
+-   Recognize the structure of a Python-based ROS 2 launch file.
+-   Comprehend how to define and launch multiple nodes from a single file.
+-   Grasp the concept of ROS 2 parameters for node configuration.
+-   Conceptually understand how to set and manage node parameters using launch files.
+
+### Introduction to ROS 2 Launch Files
+
+A ROS 2 launch file is a script that automates the process of starting and configuring a set of ROS 2 nodes. Instead of manually running `ros2 run` for each node in a separate terminal, a launch file allows you to start them all with a single command. This is essential for reproducibility, scalability, and managing the intricate dependencies of a real-world robotics application.
+
+While ROS 2 supports launch files in Python, XML, and YAML, the Python-based format offers the most flexibility and power. It allows you to use programmatic logic, such as conditionals and loops, to define your system's startup behavior.
+
+### The Structure of a Python Launch File
+
+At its core, a Python launch file is a module containing a function named `generate_launch_description()`. This function is the entry point that the `ros2 launch` command looks for. Its responsibility is to construct and return a `LaunchDescription` object, which represents the set of actions to be executed.
+
+The most common action is starting a node, which is typically done using the `launch_ros.actions.Node` class. Each instance of this class within the `LaunchDescription` corresponds to a node that will be launched.
+
+[Diagram: A high-level view of a Python launch file's structure, showing the `generate_launch_description` function returning a `LaunchDescription` object that contains multiple `Node` actions.]
+
+A conceptual Python launch file might look like this:
+
+```python
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    # The LaunchDescription object gathers all actions
+    return LaunchDescription([
+        # A Node action to start a camera driver
+        Node(
+            package='camera_driver',
+            executable='camera_node',
+            name='my_camera'
+        ),
+        # Another Node action to start an image processor
+        Node(
+            package='image_processing',
+            executable='processing_node',
+            name='image_processor'
+        )
+    ])
+```
+
+### Understanding ROS 2 Parameters
+
+Parameters are configurable values that a node can use to modify its behavior at runtime. They are a fundamental tool for creating flexible and reusable nodes, as they allow you to change settings like sensor resolutions, control gains, or topic names without recompiling your code.
+
+Think of parameters as a more structured and powerful version of command-line arguments. They are typed (e.g., integer, string, boolean), can be changed dynamically while a node is running, and can be queried and set using ROS 2 command-line tools.
+
+### Managing Parameters with Launch Files
+
+Launch files are the primary mechanism for setting a node's initial parameter values. The `Node` action constructor accepts a `parameters` argument, which takes a list of parameter configurations. This allows you to centralize the configuration of all your nodes in one place.
+
+[Example: A robotic arm controller node could be configured with different PID gains depending on the task. The launch file can set these `p_gain`, `i_gain`, and `d_gain` parameters when starting the node.]
+
+The syntax for passing parameters to a node is conceptually demonstrated below:
+
+```python
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='camera_driver',
+            executable='camera_node',
+            name='my_camera',
+            parameters=[
+                {'frame_rate': 30.0},
+                {'resolution_width': 1280},
+                {'resolution_height': 720}
+            ]
+        )
+    ])
+```
+
+### Using External Parameter Files
+
+For systems with many nodes or complex configurations, defining parameters directly in the launch file can become unwieldy. A common best practice is to store parameter values in separate YAML files. This approach separates the system's configuration (the "what") from its launch logic (the "how").
+
+A YAML parameter file allows you to define parameters for multiple nodes in a structured way. The launch file can then be instructed to load this file and apply the parameters to the corresponding nodes upon startup. This makes configuration more modular and easier to manage across different environments (e.g., simulation vs. physical hardware).
+
+[Diagram: A flowchart showing a `ros2 launch` command executing a Python launch file, which in turn reads a YAML file to fetch parameters and passes them to a new ROS 2 node.]
+
+This modular approach is key to building robust and maintainable robotic systems. It allows engineers to fine-tune system behavior by simply editing a configuration file, without touching the underlying launch logic or node source code.

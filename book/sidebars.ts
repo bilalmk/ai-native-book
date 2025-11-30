@@ -29,6 +29,20 @@ const sidebars: SidebarsConfig = {
         "physical-ai/sensor-systems",
       ],
     },
+    {
+      type: "category",
+      label: "ROS 2 Fundamentals",
+      link: {
+        type: "doc",
+        id: "ros2-fundamentals/index",
+      },
+      items: [
+        "ros2-fundamentals/ros2-architecture-core-concepts",
+        "ros2-fundamentals/nodes-topics-services-actions",
+        "ros2-fundamentals/building-ros2-packages-with-python",
+        "ros2-fundamentals/launch-files-parameter-management",
+      ],
+    },
   ],
 };
 
