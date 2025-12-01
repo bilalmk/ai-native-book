@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - QDRANT_URL=${QDRANT_URL}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      - QDRANT_COLLECTION_NAME=${QDRANT_COLLECTION_NAME}
+      - DATABASE_URL=${DATABASE_URL}
+      - ENVIRONMENT=development
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8080
+    volumes:
+      - .:/app
+      - ../book/docs:/book/docs:ro
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
