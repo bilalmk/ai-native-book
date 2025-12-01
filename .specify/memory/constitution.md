@@ -1,30 +1,31 @@
 <!-- Sync Impact Report:
-Version change: (not applicable/initial) → 1.0.0
+Version change: 1.0.0 → 1.1.0
 Modified principles:
-  - (initial template principles) → Educational Excellence
-  - (initial template principles) → AI-Native Development
-  - (initial template principles) → Spec-Driven Approach
-  - (initial template principles) → Innovation & Technology
-  - (initial template principles) → User-Centric Design
-  - (initial template principles) → Maintainability & Scalability
+  - None (existing principles preserved)
 Added sections:
-  - Target Audience
-  - Definition of "AI-Native Textbook"
-  - Content Style Guide & Tone
-  - Learning Objectives
-  - Ethical Considerations
-  - Success Metrics
+  - RAG Chatbot Governance (7 new subsections)
+    - Code Quality & Testing
+    - User Experience Requirements
+    - Security & Privacy
+    - Performance Expectations
+    - RAG & Citation Discipline
+    - Maintainability Standards
+  - Updated Success Metrics to include RAG chatbot specific metrics
+Modified sections:
+  - Success Metrics: Enhanced with RAG-specific performance indicators
 Removed sections:
-  - [SECTION_2_NAME] (from template)
-  - [SECTION_3_NAME] (from template)
+  - None
 Templates requiring updates:
-  - .specify/templates/plan-template.md (⚠ pending)
-  - .specify/templates/spec-template.md (⚠ pending)
-  - .specify/templates/tasks-template.md (⚠ pending)
+  - .specify/templates/plan-template.md (✅ updated)
+  - .specify/templates/spec-template.md (✅ updated)
+  - .specify/templates/tasks-template.md (✅ updated)
   - .specify/templates/commands/*.md (⚠ pending)
   - README.md (⚠ pending)
   - docs/quickstart.md (⚠ pending)
-Follow-up TODOs: None.
+Follow-up TODOs:
+  - Update agent-specific command files to reference new RAG chatbot principles
+  - Update README.md to reference RAG governance requirements
+  - Create ADR for RAG architecture decisions if not already documented
 -->
 # Physical AI & Humanoid Robotics Textbook Project Constitution
 
@@ -65,6 +66,7 @@ The textbook will adopt a clear, accessible, and practical tone. It should be en
 3.  **RAG Chatbot Stack:**
     *   **Agent Framework:** OpenAI Agents/ChatKit SDKs.
     *   **Backend:** FastAPI.
+    *   **Package Manager** UV for all python projects
     *   **Vector Database:** Qdrant Cloud (Free Tier).
     *   **Relational Database:** Neon Serverless Postgres.
 4.  **Code Quality:** All code contributions must adhere to established best practices, including readability, modularity, and proper error handling.
@@ -139,14 +141,111 @@ Given the profound impact of Physical AI and Humanoid Robotics, the textbook wil
 2.  **Chatbot Testing:** Thoroughly test the RAG chatbot for accuracy, relevance, and robustness in answering questions based on the book's content.
 3.  **Deployment Verification:** Ensure that the deployed book and integrated chatbot function correctly on GitHub Pages.
 
+### RAG Chatbot Governance
+
+The integrated RAG chatbot is a critical component of the AI-native learning experience. The following principles govern its development, deployment, and operation:
+
+#### 1. Code Quality & Testing
+
+*   **Unit Testing:** All chatbot backend functions MUST have unit tests with >80% code coverage. Test vector retrieval, prompt construction, and response generation independently.
+*   **Integration Testing:** End-to-end tests MUST verify the complete RAG pipeline: query → retrieval → generation → response with citations.
+*   **PEP 8 Compliance:** All Python code MUST adhere to PEP 8 style guidelines. Use automated linters (pylint, flake8, black) in CI/CD pipelines.
+*   **Documentation:** Every function and API endpoint MUST include docstrings explaining purpose, parameters, return values, and exceptions. Use type hints (typing module) for all function signatures.
+*   **Error Handling:** Implement comprehensive error handling for vector database failures, LLM API errors, and malformed queries. Log errors with contextual information.
+
+**Rationale:** High code quality ensures maintainability, reduces bugs, and enables confident iterations. Testing validates the RAG pipeline's correctness and reliability.
+
+#### 2. User Experience Requirements
+
+*   **Responsive Design:** The chat widget MUST be fully responsive, functioning seamlessly on desktop (≥1024px), tablet (768-1023px), and mobile (≤767px) viewports.
+*   **Accessibility (WCAG 2.1 Level AA):**
+    *   Keyboard navigation MUST work for all chat interactions (focus visible, tab order logical).
+    *   Screen reader compatibility MUST be verified (ARIA labels, semantic HTML).
+    *   Color contrast ratios MUST meet WCAG AA standards (≥4.5:1 for normal text).
+*   **Citation Display:** Every chatbot response MUST clearly display source citations with:
+    *   Page/section titles linked to the original content.
+    *   Visual distinction (e.g., footnote-style references, highlighted excerpts).
+    *   No hallucinated references; all citations MUST correspond to actual book content.
+*   **Response Time:** 95th percentile response latency MUST be ≤2 seconds from query submission to first token displayed (including retrieval + generation).
+*   **Loading States:** Display clear loading indicators during query processing. Provide graceful degradation messages if services are unavailable.
+
+**Rationale:** User experience directly impacts learning effectiveness. Accessibility ensures inclusivity. Fast response times and clear citations build trust and usability.
+
+#### 3. Security & Privacy
+
+*   **No PII Storage:** The chatbot MUST NOT persist any personally identifiable information (names, emails, IP addresses beyond session management).
+*   **Prompt Injection Sanitization:**
+    *   User queries MUST be sanitized to prevent prompt injection attacks (e.g., "Ignore previous instructions...").
+    *   Implement input validation: strip system-level commands, limit query length (≤1000 chars), detect and block malicious patterns.
+*   **Restricted Admin Access:**
+    *   Admin endpoints (e.g., vector database reindexing, configuration changes) MUST require authentication (API keys, OAuth).
+    *   Use environment variables for secrets; NEVER hardcode API keys or database credentials.
+*   **Rate Limiting:** Implement per-IP rate limits (e.g., 60 queries/hour) to prevent abuse and DoS attempts.
+*   **Data Encryption:** Use HTTPS for all client-server communication. Encrypt sensitive configuration at rest (e.g., database connection strings).
+
+**Rationale:** Security protects users and the system. Privacy compliance respects learners' data. Sanitization prevents exploitation of LLM vulnerabilities.
+
+#### 4. Performance Expectations
+
+*   **Asynchronous Design:** All I/O operations (database queries, LLM API calls, vector search) MUST use async/await patterns (FastAPI with asyncio).
+*   **No Blocking Calls:** Synchronous blocking calls in request handlers are PROHIBITED. Use non-blocking HTTP clients (httpx) and async database drivers.
+*   **Latency Monitoring:**
+    *   Instrument each pipeline stage (retrieval time, generation time, total response time) with metrics (Prometheus, CloudWatch, or equivalent).
+    *   Set up alerts for P95 latency exceeding 2.5s or error rates >1%.
+*   **Resource Limits:**
+    *   Limit concurrent LLM API calls (e.g., max 10 concurrent requests) to avoid quota exhaustion.
+    *   Implement connection pooling for Postgres and Qdrant to optimize database access.
+*   **Caching Strategy:** Cache frequent queries (TTL 1 hour) to reduce redundant vector searches and LLM calls.
+
+**Rationale:** Asynchronous design ensures scalability and responsiveness. Monitoring enables proactive issue detection. Resource limits prevent service degradation under load.
+
+#### 5. RAG & Citation Discipline
+
+*   **Grounded Answers:** All chatbot responses MUST be grounded in the textbook content. If the retrieved context does not contain sufficient information, the chatbot MUST respond: "I don't have enough information in the book to answer that question. Please refer to [relevant chapter] or rephrase your query."
+*   **Source Attribution:** Every factual claim MUST cite the specific page/section where the information originates. Use retrieval metadata (document IDs, section titles) to construct citations.
+*   **No Hallucination:** The chatbot MUST NOT generate information outside the textbook content. Implement confidence thresholds: if retrieval similarity score <0.7, trigger the "insufficient information" response.
+*   **Context Window Management:** Limit retrieved context to top 5 relevant chunks (≤2000 tokens total) to fit within LLM context windows and reduce noise.
+*   **Citation Validation:** Periodically audit chatbot responses to verify citation accuracy. Flag and correct any hallucinated references.
+
+**Rationale:** Grounded answers maintain educational integrity. Clear citations enable learners to verify and deepen understanding. Preventing hallucinations builds trust.
+
+#### 6. Maintainability Standards
+
+*   **Framework Discipline:** Use FastAPI for backend services. Avoid unnecessary abstractions; keep routing logic simple and declarative.
+*   **ChatKit SDK Usage:** Follow OpenAI ChatKit SDK best practices. Do not fork or heavily customize; rely on official APIs to simplify upgrades.
+*   **Architecture Documentation:**
+    *   Maintain a `docs/rag-architecture.md` file documenting:
+        *   System architecture diagram (frontend ↔ FastAPI ↔ Qdrant/Postgres ↔ OpenAI API).
+        *   Data flow for queries and responses.
+        *   Deployment topology (local dev, staging, production).
+    *   Update documentation with every significant architectural change.
+*   **Quick-Start Guide:** Provide a `docs/rag-quickstart.md` with:
+    *   Local development setup (dependencies, environment variables, database initialization).
+    *   Running unit and integration tests.
+    *   Deploying to production (CI/CD pipeline overview).
+*   **Dependency Management:** Pin exact versions in `requirements.txt` or `pyproject.toml`. Review and update dependencies quarterly for security patches.
+*   **Code Reviews:** All RAG chatbot code changes MUST undergo peer review. Check for adherence to these principles before merging.
+
+**Rationale:** Maintainability ensures the chatbot evolves with the textbook. Documentation reduces onboarding friction. Disciplined framework usage prevents technical debt.
+
 ### Success Metrics
 
 The success of this project will be measured by:
 
 *   **Educational Impact:** Demonstrated student learning outcomes as defined by the learning objectives.
 *   **Content Quality:** High ratings for clarity, accuracy, and engagement from pilot users or peer reviews.
-*   **RAG Chatbot Performance:** Achieving a high percentage of accurate and relevant responses to user queries about the book's content (e.g., >90%).
+*   **RAG Chatbot Performance:**
+    *   **Accuracy:** >90% of chatbot responses accurately grounded in textbook content (measured via manual review of sample queries).
+    *   **Citation Precision:** 100% of citations correspond to actual book content (zero hallucinated references).
+    *   **Response Latency:** P95 response time ≤2 seconds; P99 ≤3 seconds.
+    *   **User Satisfaction:** >4.0/5.0 rating for chatbot helpfulness (via in-app feedback).
+    *   **Uptime:** 99.5% availability (excluding planned maintenance).
 *   **Technical Robustness:** Stable deployment of the Docusaurus book and the integrated RAG chatbot.
+*   **Security & Privacy Compliance:** Zero security incidents related to PII leakage or prompt injection exploits.
+*   **Code Quality Metrics:**
+    *   Test coverage >80% for RAG backend code.
+    *   All linter checks passing (PEP 8 compliance).
+    *   Zero critical or high-severity vulnerabilities in dependencies (Snyk/Dependabot scans).
 *   **Community Engagement (Panaversity):** Positive feedback and adoption within the Panaversity ecosystem.
 
 ## Governance
@@ -159,4 +258,4 @@ This Constitution supersedes all other project practices and documentation. Amen
 
 All pull requests and code reviews must verify compliance with the principles outlined herein. Any introduced complexity must be thoroughly justified. The `.specify/memory/constitution.md` file serves as the definitive source for these guidelines.
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-11-28
+**Version**: 1.1.0 | **Ratified**: 2025-11-28 | **Last Amended**: 2025-12-01
