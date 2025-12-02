@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-docusaurus@latest:*)"
+      "Bash(npx create-docusaurus@latest:*)",
+      "Bash(source:*)",
+      "Bash(python scripts/index_docs.py:*)",
+      "Bash(uvicorn:*)",
+      "Bash(curl:*)",
+      "Bash(npm run start)",
+      "Bash(npm install)",
+      "Bash(python3:*)",
+      "Bash(pip install:*)",
+      "Bash(sudo apt install:*)",
+      "Bash(set:*)"
     ],
     "deny": [],
     "ask": []

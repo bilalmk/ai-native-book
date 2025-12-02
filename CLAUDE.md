@@ -212,6 +212,8 @@ See `.specify/memory/constitution.md` for code quality, testing, performance, se
 ## Active Technologies
 - Markdown/MDX with React components in a Docusaurus (TypeScript) environment. + Docusaurus, React, `robotics-course-writer` agent, `docusaurus-architect` agent, `docusaurus-deployment` skill. (006-physical-ai-intro-page)
 - N/A (content is stored as files in the Git repository). (006-physical-ai-intro-page)
+- FastAPI (Python 3.9+), OpenAI SDK, Qdrant Cloud, Neon Serverless Postgres, React/TypeScript, `rag_agent`, `frontend-design` skill, `rag_skill`. (011-rag-chatbot-integration)
 
 ## Recent Changes
 - 006-physical-ai-intro-page: Added Markdown/MDX with React components in a Docusaurus (TypeScript) environment. + Docusaurus, React, `robotics-course-writer` agent, `docusaurus-architect` agent, `docusaurus-deployment` skill.
+- 011-rag-chatbot-integration: Added RAG chatbot system with FastAPI backend, OpenAI embeddings/chat, Qdrant vector database, Neon Postgres, React/TypeScript frontend integration via Docusaurus swizzling.
