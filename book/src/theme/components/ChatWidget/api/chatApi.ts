@@ -5,7 +5,7 @@
  */
 
 const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? 'https://your-backend-url.com'  // Replace with actual production URL
+  ? 'https://your-app.railway.app'  // Replace with your Railway/Render/Vercel URL
   : 'http://localhost:8000';
 
 export interface ChatRequest {

@@ -36,23 +36,23 @@ pip install -e .
 
 ## Step 4: Configure Environment Variables
 
-The `.env.example` file already contains your credentials. Just rename it:
+Copy the example file and add your real credentials:
 
 ```bash
 cp .env.example .env
 ```
 
-**Your current configuration:**
-- ✓ OpenAI API key configured
-- ✓ Qdrant URL and API key configured
-- ✓ Neon Postgres database URL configured
+Then edit `.env` and replace the placeholder values with your actual credentials:
+- OpenAI API key from https://platform.openai.com/api-keys
+- Qdrant URL and API key from your Qdrant Cloud dashboard
+- Neon Postgres database URL from your Neon console
 
 ## Step 5: Apply Database Schema
 
-Connect to your Neon database and run the schema:
+Connect to your Neon database using the connection string from your `.env` file:
 
 ```bash
-psql "postgresql://neondb_owner:npg_8XGdMNcBk2oa@ep-odd-leaf-ahcmbb1n-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require"
+psql "$DATABASE_URL"
 ```
 
 Then paste the contents of:
@@ -60,7 +60,7 @@ Then paste the contents of:
 
 **Or run it directly:**
 ```bash
-psql "postgresql://neondb_owner:npg_8XGdMNcBk2oa@ep-odd-leaf-ahcmbb1n-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require" < ../specs/011-rag-chatbot-integration/contracts/database-schema.sql
+psql "$DATABASE_URL" < ../specs/011-rag-chatbot-integration/contracts/database-schema.sql
 ```
 
 ## Step 6: Index Documentation
