@@ -91,7 +91,15 @@ class RAGService:
                 )
                 logger.info("Generated LLM response")
 
-                # Step 7: Format sources
+                # Step 7: Format sources (deduplicate by file_path, keeping highest score)
+                seen_files = {}
+                for chunk in retrieved_chunks:
+                    file_path = chunk["file_path"]
+                    # Keep only the highest-scoring chunk for each file
+                    if file_path not in seen_files or chunk["relevance_score"] > seen_files[file_path]["relevance_score"]:
+                        seen_files[file_path] = chunk
+
+                # Create Source objects from deduplicated chunks
                 sources = [
                     Source(
                         title=chunk["title"],
@@ -99,8 +107,10 @@ class RAGService:
                         relevance_score=chunk["relevance_score"],
                         excerpt=chunk["chunk_text"][:500],  # Limit excerpt length
                     )
-                    for chunk in retrieved_chunks
+                    for chunk in seen_files.values()
                 ]
+                # Sort by relevance score (highest first)
+                sources.sort(key=lambda x: x.relevance_score, reverse=True)
 
             # Step 8: Save user message
             await self.conversation_service.save_message(

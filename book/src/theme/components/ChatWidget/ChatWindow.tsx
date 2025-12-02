@@ -21,6 +21,7 @@ interface ChatWindowProps {
   onRetry: () => void;
   selectedText: string;
   onClearSelection: () => void;
+  onClearChat: () => void;
 }
 
 export default function ChatWindow({
@@ -32,18 +33,29 @@ export default function ChatWindow({
   onRetry,
   selectedText,
   onClearSelection,
+  onClearChat,
 }: ChatWindowProps): JSX.Element {
   return (
     <div className={styles.chatWindow} role="dialog" aria-label="Chat window">
       <div className={styles.chatHeader}>
         <h3>💬 Chat Assistant</h3>
-        <button
-          className={styles.closeButton}
-          onClick={onClose}
-          aria-label="Close chat"
-        >
-          ✕
-        </button>
+        <div className={styles.headerButtons}>
+          <button
+            className={styles.clearButton}
+            onClick={onClearChat}
+            aria-label="Clear chat history"
+            title="Clear chat history"
+          >
+            🗑️
+          </button>
+          <button
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Close chat"
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       {selectedText && (

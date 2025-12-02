@@ -149,45 +149,46 @@ As a user waiting for a chatbot response, I want clear visual feedback showing t
 - **FR-022**: System MUST auto-scroll to the newest message when new content arrives
 - **FR-023**: System MUST persist session in browser localStorage so conversation survives page reloads
 - **FR-024**: System MUST support sending messages via Enter key or button click
-- **FR-025**: System MUST provide a "Clear conversation" button to start a new session
+- **FR-025**: System MUST provide a "Clear conversation" button in chat header to clear chat history and start a new session
+- **FR-026**: System MUST immediately clear all messages, session state, and localStorage when clear button is clicked
 
 #### Text Selection Feature
 
-- **FR-026**: System MUST detect when user selects text on the documentation page
-- **FR-027**: System MUST display a yellow banner "📝 Using selected text as context" when text between 1-1000 characters is selected
-- **FR-028**: System MUST include selected text in the API request as additional context
-- **FR-029**: System MUST clear selected text context after message is sent or user clicks the X button
-- **FR-030**: System MUST ignore text selections under 1 character or over 1000 characters
+- **FR-027**: System MUST detect when user selects text on the documentation page
+- **FR-028**: System MUST display a yellow banner "📝 Using selected text as context" when text between 1-1000 characters is selected
+- **FR-029**: System MUST include selected text in the API request as additional context
+- **FR-030**: System MUST clear selected text context after message is sent or user clicks the X button
+- **FR-031**: System MUST ignore text selections under 1 character or over 1000 characters
 
 #### API Endpoints
 
-- **FR-031**: System MUST provide a `GET /api/health` endpoint returning status of all services (Qdrant, Postgres, OpenAI connectivity)
-- **FR-032**: System MUST provide a `POST /api/chat` endpoint accepting {message, session_id?, selected_text?} and returning {session_id, message, sources[], timestamp}
-- **FR-033**: System MUST provide a `GET /api/sessions/{session_id}/history` endpoint returning full conversation history in chronological order
+- **FR-032**: System MUST provide a `GET /api/health` endpoint returning status of all services (Qdrant, Postgres, OpenAI connectivity)
+- **FR-033**: System MUST provide a `POST /api/chat` endpoint accepting {message, session_id?, selected_text?} and returning {session_id, message, sources[], timestamp}
+- **FR-034**: System MUST provide a `GET /api/sessions/{session_id}/history` endpoint returning full conversation history in chronological order
 
 #### Accessibility & Responsiveness
 
-- **FR-034**: System MUST support keyboard navigation (Tab, Enter, Esc) for all chat interactions
-- **FR-035**: System MUST provide ARIA labels for screen reader compatibility
-- **FR-036**: System MUST maintain color contrast ratios of at least 4.5:1 (WCAG AA standard)
-- **FR-037**: System MUST support both light and dark mode via `[data-theme='dark']` CSS selectors
-- **FR-038**: System MUST render properly on desktop (≥1024px), tablet (768-1023px), and mobile (≤767px) viewports
+- **FR-035**: System MUST support keyboard navigation (Tab, Enter, Esc) for all chat interactions
+- **FR-036**: System MUST provide ARIA labels for screen reader compatibility
+- **FR-037**: System MUST maintain color contrast ratios of at least 4.5:1 (WCAG AA standard)
+- **FR-038**: System MUST support both light and dark mode via `[data-theme='dark']` CSS selectors
+- **FR-039**: System MUST render properly on desktop (≥1024px), tablet (768-1023px), and mobile (≤767px) viewports
 
 #### Error Handling & Validation
 
-- **FR-039**: System MUST validate all user inputs using schema validation (Pydantic models on backend, TypeScript interfaces on frontend)
-- **FR-040**: System MUST sanitize user queries to prevent prompt injection attacks (strip system-level commands, detect malicious patterns)
-- **FR-041**: System MUST display user-friendly error messages when backend services are unavailable
-- **FR-042**: System MUST handle transient API failures with automatic retry logic (up to 3 retries with exponential backoff)
-- **FR-043**: System MUST limit query length to 1000 characters to prevent abuse
+- **FR-040**: System MUST validate all user inputs using schema validation (Pydantic models on backend, TypeScript interfaces on frontend)
+- **FR-041**: System MUST sanitize user queries to prevent prompt injection attacks (strip system-level commands, detect malicious patterns)
+- **FR-042**: System MUST display user-friendly error messages when backend services are unavailable
+- **FR-043**: System MUST handle transient API failures with automatic retry logic (up to 3 retries with exponential backoff)
+- **FR-044**: System MUST limit query length to 1000 characters to prevent abuse
 
 #### Security & Privacy
 
-- **FR-044**: System MUST NOT persist personally identifiable information (names, emails, IP addresses beyond session management)
-- **FR-045**: System MUST configure CORS to accept requests only from specified allowed origins
-- **FR-046**: System MUST store all API keys and database credentials in environment variables
-- **FR-047**: System MUST use HTTPS for all client-server communication in production
-- **FR-048**: System MUST log errors with contextual information but MUST NOT log sensitive data (API keys, user content)
+- **FR-045**: System MUST NOT persist personally identifiable information (names, emails, IP addresses beyond session management)
+- **FR-046**: System MUST configure CORS to accept requests only from specified allowed origins
+- **FR-047**: System MUST store all API keys and database credentials in environment variables
+- **FR-048**: System MUST use HTTPS for all client-server communication in production
+- **FR-049**: System MUST log errors with contextual information but MUST NOT log sensitive data (API keys, user content)
 
 ### Key Entities
 
@@ -355,3 +356,349 @@ The following metrics are provided from a verified working implementation to gui
 - **Deployment Time**: 15 minutes (from code complete to production)
 
 These metrics demonstrate that the requirements are achievable and provide realistic targets for implementation planning.
+
+## Testing Results & Implementation Notes
+
+**Testing Date**: 2025-12-02
+**Environment**: WSL2, Python 3.12.3, Node.js (latest)
+**Status**: ✅ MVP Acceptance Criteria Met (7/7 core tests passing)
+
+### Critical Fixes Applied During Testing
+
+#### 1. SQLAlchemy AsyncPG Database URL Configuration
+**Issue**: SQLAlchemy with asyncpg driver requires specific URL format and connection parameters that differ from standard psycopg2.
+
+**Error Encountered**:
+```
+ModuleNotFoundError: No module named 'psycopg2'
+TypeError: connect() got an unexpected keyword argument 'sslmode'
+```
+
+**Root Cause**:
+- Standard PostgreSQL URL format (`postgresql://`) attempts to use psycopg2 by default
+- asyncpg driver doesn't support `sslmode` and `channel_binding` URL parameters
+- These parameters must be converted to `connect_args` format
+
+**Fix Applied** (`backend/src/services/conversation.py:76-91`):
+```python
+import re
+db_url = settings.database_url.replace("postgresql://", "postgresql+asyncpg://")
+db_url = re.sub(r'[?&](sslmode|channel_binding)=[^&]*', '', db_url)
+db_url = re.sub(r'[?&]$', '', db_url)
+self.engine = create_async_engine(
+    db_url,
+    pool_size=settings.database_pool_size,
+    max_overflow=settings.database_max_overflow,
+    echo=False,
+    connect_args={"ssl": "require"},
+)
+```
+
+**Impact**: Backend now starts successfully with Neon Postgres connection.
+
+#### 2. OpenAI API Key Validation
+**Issue**: Initial API key was invalid/expired.
+
+**Error**: `401 Unauthorized - Incorrect API key provided`
+
+**Fix**: User updated `.env` file with valid OpenAI API key. Backend auto-reloaded configuration.
+
+**Impact**: All OpenAI services (embeddings, chat completions) now functional.
+
+#### 3. Frontend Dependencies Installation
+**Issue**: Docusaurus dependencies not installed, causing `'docusaurus' is not recognized` error.
+
+**Fix**: Ran `npm install` in `book/` directory (1311 packages installed in ~2 minutes).
+
+**Impact**: Frontend server now starts successfully.
+
+### Test Results Summary
+
+#### ✅ Passing Tests (7/7 Core Criteria)
+
+1. **Health Check**: All services report healthy (Qdrant, Postgres, OpenAI)
+2. **Basic Query**: "What is Physical AI?" returns comprehensive answer with citations
+3. **Sensor Systems Query**: Technical query returns detailed explanation
+4. **Humanoid Robotics Query**: Complex topic handled with multi-part answer
+5. **Out-of-Scope Handling**: "What is the weather?" correctly rejected
+6. **Session Persistence**: Conversation history loaded from database
+7. **Database Persistence**: Messages confirmed saved to Postgres
+
+#### ⚠️ Known Limitations Discovered
+
+1. **Strict Similarity Threshold (0.7)**
+   - Some valid queries don't find results due to high threshold
+   - Examples: "What is ROS2?" returns no results
+   - Recommendation: Lower threshold to 0.65-0.68 in future iteration
+   - File: `backend/src/config.py:47`
+
+2. **Context-Aware Query Enhancement Not Implemented**
+   - Follow-up questions like "What are its main components?" fail without explicit context
+   - System loads conversation history but doesn't use it to enhance query embeddings
+   - Status: Feature gap (not critical for MVP, marked as P2 priority)
+
+3. **Limited Documentation Coverage**
+   - Only 66 chunks from 30 files indexed
+   - Some domain-specific queries may lack sufficient content
+   - Recommendation: Index all available documentation in production
+
+4. **History Retrieval Endpoint Missing**
+   - No dedicated GET endpoint for fetching session history
+   - Frontend must manage history via localStorage
+   - Status: Not critical (sessions work via chat endpoint with session_id)
+
+### Performance Metrics (Actual)
+
+- **Response Time**: 7-13 seconds per query (exceeds 3s target, acceptable for MVP)
+  - Session creation/lookup: 5-6s
+  - Embedding generation: 1s
+  - Vector search: 1s
+  - LLM generation: 4-5s
+  - Database save: 600ms
+- **Relevance Scores**: 0.70-0.74 (good semantic matching above threshold)
+- **Indexing**: 30 files, 66 chunks, ~3 minutes total
+- **Memory**: Backend ~200MB, Frontend ~150MB during compilation
+
+### Deployment Status
+
+- **Backend**: Running locally on http://localhost:8000
+- **Frontend**: Running locally on http://localhost:3000/ai-native-book/
+- **Production Deployment**: Not yet performed (requires Railway/Render setup)
+
+### Critical Fix Applied: Similarity Threshold Optimization
+
+**Date**: 2025-12-02
+**Issue**: Query "Why Simulation Matters in Robotics" returned 0 results despite content being indexed
+**Investigation**: Test revealed content scores of 0.6951 were below threshold of 0.7
+
+**Root Cause Analysis**:
+- Content was properly indexed (30 files, 66 chunks) ✅
+- Vector search was working correctly ✅
+- Query embedding matched content with score 0.6951
+- Similarity threshold 0.7 filtered out relevant results ❌
+- Result: Valid queries returned "I don't have information about that"
+
+**Fix Applied**:
+- Lowered `SIMILARITY_THRESHOLD` from 0.7 → 0.6 in `backend/.env`
+- Updated `backend/.env.example` for future deployments
+- Restarted backend server to apply configuration change
+
+**Verification**:
+```bash
+# Test query with different thresholds showed:
+Threshold 0.7: 0 results found ❌
+Threshold 0.6: 5 results found (scores: 0.6384-0.6951) ✅
+```
+
+**Impact**:
+- Chatbot now successfully answers queries about simulation, robotics, and related topics
+- Top result (score 0.6951) from `robot-simulation-gazebo/index.md` correctly returned
+- Balance between precision and recall improved for semantic search
+
+**Files Modified**:
+- `backend/.env:27` - SIMILARITY_THRESHOLD=0.6
+- `backend/.env.example:27` - SIMILARITY_THRESHOLD=0.6
+
+**Testing Outcome**: ✅ Query "Why Simulation Matters in Robotics" now returns comprehensive answer with citations
+
+### Next Steps for Production
+
+1. ✅ ~~Lower similarity threshold to 0.65-0.68 for better recall~~ COMPLETE (0.6 applied)
+2. Implement query expansion using conversation context
+3. Add dedicated history endpoint (`GET /api/chat/history/{session_id}`)
+4. Index all documentation files (target: 150+ chunks)
+5. Deploy backend to Railway/Render
+6. Update frontend API URL for production backend
+7. Configure CORS for GitHub Pages domain
+
+### Critical Fix Applied: Duplicate Sources and URL Construction
+
+**Date**: 2025-12-02
+**Issues**:
+1. Duplicate source references appearing in chatbot responses
+2. Incorrect URLs missing `/ai-native-book` baseUrl and wrong path handling
+
+#### Issue 1: Duplicate Source References
+
+**Problem Description**:
+- Multiple chunks from the same document were displayed as separate sources
+- Example: "index(69% relevant)" appeared twice in the sources list
+- Caused confusion and cluttered the UI
+
+**Investigation**:
+- Backend RAG service returned all matching chunks without deduplication
+- Each chunk from the same document created a separate Source object
+- No filtering by file_path in the source formatting logic
+
+**Root Cause**:
+- `backend/src/services/rag_service.py:94-103` created Source objects directly from retrieved chunks
+- No deduplication logic to consolidate multiple chunks from the same document
+- All chunks with scores above threshold were included, regardless of document
+
+**Fix Applied** (`backend/src/services/rag_service.py:94-113`):
+```python
+# Step 7: Format sources (deduplicate by file_path, keeping highest score)
+seen_files = {}
+for chunk in retrieved_chunks:
+    file_path = chunk["file_path"]
+    # Keep only the highest-scoring chunk for each file
+    if file_path not in seen_files or chunk["relevance_score"] > seen_files[file_path]["relevance_score"]:
+        seen_files[file_path] = chunk
+
+# Create Source objects from deduplicated chunks
+sources = [
+    Source(
+        title=chunk["title"],
+        file_path=chunk["file_path"],
+        relevance_score=chunk["relevance_score"],
+        excerpt=chunk["chunk_text"][:500],
+    )
+    for chunk in seen_files.values()
+]
+# Sort by relevance score (highest first)
+sources.sort(key=lambda x: x.relevance_score, reverse=True)
+```
+
+**Verification**:
+- Tested with query about Isaac SDK and Gazebo
+- Sources now show unique documents only (no duplicates)
+- Each document appears once with its highest relevance score
+
+**Impact**:
+- ✅ Cleaner source citations in chatbot responses
+- ✅ Each document referenced only once
+- ✅ Sources sorted by relevance (most relevant first)
+- ✅ Better user experience with less clutter
+
+#### Issue 2: Incorrect URL Construction
+
+**Problem Description**:
+- Source links missing `/ai-native-book` baseUrl
+- URLs incorrectly including `/index` at the end
+- Examples:
+  - ❌ Old: `http://localhost:3000/docs/nvidia-isaac-platform/isaac-sdk-and-sim/index`
+  - ❌ Old: `http://localhost:3000/docs/robot-simulation-gazebo/index`
+
+**Investigation**:
+- Frontend SourceCitation component used simple string replacement
+- Did not account for Docusaurus baseUrl configuration
+- Did not handle `/index` paths correctly
+
+**Root Cause**:
+- `book/src/theme/components/ChatWidget/SourceCitation.tsx:25` used naive URL construction:
+  ```typescript
+  href={`/docs/${source.file_path.replace('.mdx', '').replace('.md', '')}`}
+  ```
+- Missing baseUrl prefix (`/ai-native-book`)
+- No logic to remove `/index` from paths
+
+**Fix Applied** (`book/src/theme/components/ChatWidget/SourceCitation.tsx:15-32`):
+```typescript
+/**
+ * Convert file path to Docusaurus URL.
+ *
+ * Examples:
+ * - "nvidia-isaac-platform/isaac-sdk-and-sim/index.mdx" -> "/ai-native-book/docs/nvidia-isaac-platform/isaac-sdk-and-sim"
+ * - "robot-simulation-gazebo/index.mdx" -> "/ai-native-book/docs/robot-simulation-gazebo"
+ * - "intro.md" -> "/ai-native-book/docs/intro"
+ */
+function filePathToUrl(filePath: string): string {
+  // Remove file extension
+  let path = filePath.replace(/\.(mdx?|md)$/, '');
+
+  // Remove trailing /index
+  path = path.replace(/\/index$/, '');
+
+  // Add baseUrl and docs prefix
+  return `/ai-native-book/docs/${path}`;
+}
+```
+
+**Verification**:
+- Tested with various file paths:
+  - ✅ `nvidia-isaac-platform/isaac-sdk-and-sim/index.mdx` → `/ai-native-book/docs/nvidia-isaac-platform/isaac-sdk-and-sim`
+  - ✅ `robot-simulation-gazebo/index.mdx` → `/ai-native-book/docs/robot-simulation-gazebo`
+  - ✅ `intro.md` → `/ai-native-book/docs/intro`
+- All source links now navigate correctly
+
+**Impact**:
+- ✅ All source citations link to correct pages
+- ✅ URLs include proper baseUrl for GitHub Pages deployment
+- ✅ Clean URLs without `/index` suffix
+- ✅ Works in both local development and production
+
+#### Additional Improvements: Database Management
+
+**Enhancement**: Added collection clearing and reindexing capability
+
+**Files Created**:
+1. `backend/src/services/vector_store.py:174-187` - Added `delete_collection()` method
+2. `backend/scripts/clear_and_reindex.py` - Script to clear and reindex all documents
+
+**Purpose**:
+- Allows clean database resets when fixing indexing issues
+- Useful for testing and development
+- Prevents stale data from affecting chatbot responses
+
+**Usage**:
+```bash
+cd backend
+source venv/bin/activate
+python3 scripts/clear_and_reindex.py
+```
+
+**Execution Results** (2025-12-02):
+- ✅ Deleted existing collection: ai_native_book
+- ✅ Reindexed 30 files → 66 chunks
+- ✅ All documents successfully embedded and stored in Qdrant
+- ✅ Backend automatically reconnected to new collection
+
+**Testing Outcome**:
+✅ All fixes verified working. Chatbot now displays unique sources with correct URLs.
+
+### Clear Chat History Feature
+
+**Implementation Date**: 2025-12-02
+**Status**: ✅ Complete
+
+**User Requirement**: Users need ability to clear previous chat history and start fresh conversations
+
+**Implementation Details**:
+
+**Frontend Changes**:
+1. `book/src/theme/components/ChatWidget/ChatWindow.tsx:40-59`
+   - Added trash can button (🗑️) in chat header next to close button
+   - Added `onClearChat` prop to component interface
+   - Grouped header buttons with flexbox layout
+
+2. `book/src/theme/components/ChatWidget/index.tsx:129-139`
+   - Implemented `handleClearChat()` function that:
+     - Clears all messages from state
+     - Resets session ID to null
+     - Clears error state
+     - Clears selected text
+     - Removes data from localStorage
+
+3. `book/src/theme/components/ChatWidget/styles.module.css:71-97`
+   - Added `.headerButtons` class for button grouping
+   - Added `.clearButton` class with consistent styling
+   - Hover effects for both clear and close buttons
+
+**Features**:
+- Trash can icon (🗑️) button positioned in chat header
+- Immediately clears all conversation history
+- Resets session allowing fresh start
+- Clears browser localStorage
+- Maintains consistent UI styling with other header elements
+
+**Testing**:
+- ✅ Button visible and accessible in chat header
+- ✅ Click clears all messages immediately
+- ✅ Session reset confirmed (new session ID on next message)
+- ✅ localStorage cleared verified in DevTools
+- ✅ Styling consistent with existing UI design
+
+**Files Modified**:
+- `book/src/theme/components/ChatWidget/ChatWindow.tsx` (interface + UI)
+- `book/src/theme/components/ChatWidget/index.tsx` (logic)
+- `book/src/theme/components/ChatWidget/styles.module.css` (styling)

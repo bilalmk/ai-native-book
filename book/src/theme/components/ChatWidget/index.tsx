@@ -126,6 +126,18 @@ export default function ChatWidget(): JSX.Element {
     setSelectedText('');
   };
 
+  const handleClearChat = () => {
+    // Clear all state
+    setMessages([]);
+    setSessionId(null);
+    setError(null);
+    setSelectedText('');
+    setLastMessage('');
+
+    // Clear localStorage
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   return (
     <>
       <ChatButton onClick={() => setIsOpen(!isOpen)} isOpen={isOpen} />
@@ -139,6 +151,7 @@ export default function ChatWidget(): JSX.Element {
           onRetry={handleRetry}
           selectedText={selectedText}
           onClearSelection={handleClearSelection}
+          onClearChat={handleClearChat}
         />
       )}
     </>

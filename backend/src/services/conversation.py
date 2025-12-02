@@ -75,11 +75,19 @@ class ConversationService:
 
     def __init__(self):
         """Initialize database connection."""
+        # Convert postgresql:// to postgresql+asyncpg:// for SQLAlchemy async
+        # Remove sslmode/channel_binding parameters as asyncpg doesn't support them
+        import re
+        db_url = settings.database_url.replace("postgresql://", "postgresql+asyncpg://")
+        db_url = re.sub(r'[?&](sslmode|channel_binding)=[^&]*', '', db_url)
+        # Clean up any trailing ? or &
+        db_url = re.sub(r'[?&]$', '', db_url)
         self.engine = create_async_engine(
-            settings.database_url,
+            db_url,
             pool_size=settings.database_pool_size,
             max_overflow=settings.database_max_overflow,
             echo=False,
+            connect_args={"ssl": "require"},
         )
         self.async_session = async_sessionmaker(
             self.engine, class_=AsyncSession, expire_on_commit=False

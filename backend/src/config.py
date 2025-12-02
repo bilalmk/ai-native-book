@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     chunk_overlap: int = Field(default=200, description="Chunk overlap in words")
     top_k_results: int = Field(default=5, description="Number of top results to retrieve")
     similarity_threshold: float = Field(
-        default=0.7, description="Minimum similarity threshold for retrieval"
+        default=0.6, description="Minimum similarity threshold for retrieval"
     )
     max_query_length: int = Field(default=1000, description="Maximum query length in characters")
     max_conversation_context: int = Field(

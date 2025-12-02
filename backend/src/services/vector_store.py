@@ -170,3 +170,18 @@ class VectorStoreService:
         except Exception as e:
             logger.error(f"Failed to get collection info: {str(e)}")
             return {}
+
+    async def delete_collection(self) -> bool:
+        """
+        Delete the collection.
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            await self.client.delete_collection(self.collection_name)
+            logger.info(f"Deleted collection: {self.collection_name}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to delete collection: {str(e)}")
+            return False

@@ -68,11 +68,18 @@
   font-weight: 600;
 }
 
+.headerButtons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.clearButton,
 .closeButton {
   background: none;
   border: none;
   color: white;
-  font-size: 24px;
+  font-size: 20px;
   cursor: pointer;
   padding: 0;
   width: 32px;
@@ -84,6 +91,7 @@
   transition: background 0.2s;
 }
 
+.clearButton:hover,
 .closeButton:hover {
   background: rgba(255, 255, 255, 0.2);
 }
