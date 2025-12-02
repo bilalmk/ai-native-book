@@ -8,7 +8,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.api import health, chat, sessions
+from src.api import health, chat, sessions, debug
 from src.config import settings
 from src.services.conversation import ConversationService
 from src.services.vector_store import VectorStoreService
@@ -67,6 +67,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+@app.get("/")
+def home():
+    return {"status": "backend running"}
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -92,6 +96,7 @@ async def log_requests(request, call_next):
 app.include_router(health.router, prefix="/api", tags=["health"])
 app.include_router(chat.router, prefix="/api", tags=["chat"])
 app.include_router(sessions.router, prefix="/api", tags=["sessions"])
+app.include_router(debug.router, prefix="/api", tags=["debug"])
 
 logger.info("Routes registered")
 
