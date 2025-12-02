@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     qdrant_url: str = Field(..., description="Qdrant cluster URL")
     qdrant_api_key: str = Field(..., description="Qdrant API key")
     qdrant_collection_name: str = Field(
-        default="documentation_chunks", description="Qdrant collection name"
+        default="ai_native_book", description="Qdrant collection name"
     )
 
     # Neon Postgres Configuration
