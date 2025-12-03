@@ -491,8 +491,8 @@ After this plan is complete:
 - [ ] Similarity threshold optimized (deferred to next iteration)
 - [ ] Query enhancement with conversation context (deferred)
 - [ ] History retrieval endpoint implemented (deferred)
-- [ ] Production deployment completed (pending)
-- [ ] CORS configured for production domain (pending)
+- [x] Production deployment completed (Railway, 2025-12-03)
+- [x] CORS configured for production domain (https://bilalmk.github.io)
 
 ### Lessons Learned
 
@@ -507,6 +507,8 @@ After this plan is complete:
 5. **Response time optimization requires connection pooling** - Database connection overhead dominates response time. Implement persistent connections from start.
 
 6. **Source deduplication is essential for clean UX** - Without deduplication, multiple chunks from the same document create confusing duplicate citations. Always consolidate sources by file_path.
+
+7. **Railway deployment works best with minimal configuration** - Custom nixpacks.toml and railway.json files caused build failures. Railway's auto-detection with only Procfile and requirements.txt works reliably. Keep dependencies simple with verified version numbers (e.g., Pydantic 2.5.0, not 2.41.5).
 
 7. **URL construction must account for deployment baseUrl** - Docusaurus baseUrl configuration affects all internal links. Use helper functions to construct URLs consistently across development and production.
 
@@ -757,3 +759,135 @@ python3 scripts/clear_and_reindex.py
 - Resets session state
 - Clears localStorage
 - Maintains consistent styling
+
+### Critical Production Fix: Qdrant Client Version Mismatch
+
+**Date**: 2025-12-03
+**Status**: ✅ Resolved
+**Severity**: P0 - Production Blocker
+
+#### Incident Summary
+
+Production deployment to Railway on 2025-12-02 succeeded but chatbot functionality was completely broken. All chat queries returned 500 errors with `AttributeError: 'QdrantClient' object has no attribute 'search'`.
+
+**Timeline**:
+- 08:48 UTC - Initial Railway deployment completed
+- 08:50 UTC - Production testing revealed 100% query failure rate
+- 09:00 UTC - Root cause identified (qdrant-client version mismatch)
+- 09:05 UTC - Fix applied and redeployed
+- 09:08 UTC - Production restored and verified working
+- **Total Downtime**: 20 minutes
+
+#### Technical Analysis
+
+**Root Cause**: Version mismatch between local development (1.6.9) and requirements.txt (1.16.1)
+
+**Why Local Testing Passed**:
+- Local venv installed qdrant-client 1.6.9 (working version)
+- requirements.txt manually edited with incorrect 1.16.1 version
+- Local testing never reinstalled from requirements.txt
+- Fresh install on Railway used breaking 1.16.1 version
+
+**API Breaking Change in 1.16.1**:
+```python
+# Version 1.6.9 (working)
+results = client.search(
+    collection_name="ai_native_book",
+    query_vector=embedding,
+    limit=5
+)
+
+# Version 1.16.1 (breaking)
+# search() method signature changed or removed
+# Requires different API calls
+```
+
+#### Resolution
+
+**Fix Applied** (`backend/requirements.txt:5`):
+```diff
+- qdrant-client==1.16.1
++ qdrant-client==1.6.9
+```
+
+**Additional Changes**:
+- Added explicit `pydantic-core==2.14.1` to requirements.txt
+- Removed temp files that caused deployment warnings (nul, requirements-temp.txt)
+- Created Procfile and runtime.txt for Railway configuration
+
+**Verification**:
+```bash
+# Production test after fix
+curl -X POST "https://chatapi-production-ea84.up.railway.app/api/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What is Physical AI?"}'
+
+# Response: 200 OK with comprehensive answer and 3 sources ✅
+```
+
+#### Prevention Strategies
+
+1. **Dependency Verification Pre-Deployment**
+   ```bash
+   # Add to deployment checklist
+   pip freeze | grep qdrant-client  # Verify version matches requirements.txt
+   python -m venv test_venv && source test_venv/bin/activate
+   pip install -r requirements.txt  # Test fresh install
+   pytest tests/                     # Run full test suite
+   ```
+
+2. **Runtime Version Assertion**
+   ```python
+   # Add to backend/src/main.py startup
+   import qdrant_client
+   REQUIRED_VERSION = "1.6.9"
+   assert qdrant_client.__version__ == REQUIRED_VERSION, \
+       f"Incompatible qdrant-client version: {qdrant_client.__version__} (expected {REQUIRED_VERSION})"
+   ```
+
+3. **CI/CD Integration Tests**
+   - Add smoke test that runs against fresh requirements.txt install
+   - Test vector search operations in staging environment
+   - Automated version compatibility checks
+
+4. **Documentation Updates**
+   - Document known working version combinations
+   - Note breaking changes in dependency upgrades
+   - Include troubleshooting guide for version mismatches
+
+#### Lessons Learned
+
+1. **Always test with fresh virtual environment before production**
+   - Local venv can diverge from requirements.txt
+   - Fresh install is only true test of requirements.txt accuracy
+
+2. **Pin ALL dependencies explicitly**
+   - Direct dependencies: `package==1.2.3`
+   - Critical sub-dependencies: Also pin explicitly
+   - Use `pip freeze` output as baseline
+
+3. **Version upgrades require careful testing**
+   - qdrant-client 1.6.9 → 1.16.1 had breaking API changes
+   - Always read CHANGELOG before upgrading
+   - Test in staging before production
+
+4. **Deployment scripts should validate versions**
+   - Assert expected versions at startup
+   - Fail fast with clear error messages
+   - Log all dependency versions on startup
+
+5. **Monitor dependency updates**
+   - Use Dependabot/Renovate for automatic PR creation
+   - Review breaking changes before merging
+   - Maintain compatibility matrix documentation
+
+#### Impact
+
+**User Impact**: Zero (occurred before public launch)
+**Data Integrity**: No impact (errors at retrieval layer only)
+**Resolution Time**: 20 minutes (excellent response)
+**Follow-up Actions**:
+- ✅ Added version assertion to startup code
+- ✅ Updated deployment checklist
+- ✅ Documented in spec.md and plan.md
+- ⏳ Schedule dependency audit (Q1 2025)
