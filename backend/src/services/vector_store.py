@@ -7,7 +7,7 @@ Manages vector search operations using Qdrant Cloud.
 import logging
 from typing import List, Dict, Any
 from uuid import UUID, uuid4
-from qdrant_client import AsyncQdrantClient
+from qdrant_client import QdrantClient
 from qdrant_client.models import (
     Distance,
     VectorParams,
@@ -26,7 +26,7 @@ class VectorStoreService:
 
     def __init__(self):
         """Initialize Qdrant client."""
-        self.client = AsyncQdrantClient(
+        self.client = QdrantClient(
             url=settings.qdrant_url,
             api_key=settings.qdrant_api_key,
         )
@@ -40,11 +40,11 @@ class VectorStoreService:
         Creates a collection with cosine distance metric and configured dimensions.
         """
         try:
-            collections = await self.client.get_collections()
+            collections = self.client.get_collections()
             collection_names = [c.name for c in collections.collections]
 
             if self.collection_name not in collection_names:
-                await self.client.create_collection(
+                self.client.create_collection(
                     collection_name=self.collection_name,
                     vectors_config=VectorParams(
                         size=self.dimension,
@@ -82,7 +82,7 @@ class VectorStoreService:
                 )
                 points.append(point)
 
-            await self.client.upsert(
+            self.client.upsert(
                 collection_name=self.collection_name,
                 points=points,
             )
@@ -113,7 +113,7 @@ class VectorStoreService:
             Exception: If search fails
         """
         try:
-            results = await self.client.search(
+            results = self.client.search(
                 collection_name=self.collection_name,
                 query_vector=query_embedding,
                 limit=top_k,
@@ -147,7 +147,7 @@ class VectorStoreService:
             True if healthy, False otherwise
         """
         try:
-            collections = await self.client.get_collections()
+            collections = self.client.get_collections()
             return True
         except Exception as e:
             logger.error(f"Qdrant health check failed: {str(e)}")
