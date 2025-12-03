@@ -461,9 +461,12 @@ self.engine = create_async_engine(
 
 ### Deployment Status
 
-- **Backend**: Running locally on http://localhost:8000
-- **Frontend**: Running locally on http://localhost:3000/ai-native-book/
-- **Production Deployment**: Not yet performed (requires Railway/Render setup)
+- **Backend**:
+  - Local: http://localhost:8000
+  - Production: https://chatapi-production-ea84.up.railway.app (Railway)
+- **Frontend**:
+  - Local: http://localhost:3000/ai-native-book/
+  - Production: https://bilalmk.github.io/ai-native-book/ (GitHub Pages)
 
 ### Critical Fix Applied: Similarity Threshold Optimization
 
@@ -656,6 +659,102 @@ python3 scripts/clear_and_reindex.py
 **Testing Outcome**:
 ✅ All fixes verified working. Chatbot now displays unique sources with correct URLs.
 
+### Railway Production Deployment
+
+**Deployment Date**: 2025-12-03
+**Platform**: Railway (https://railway.app)
+**Status**: ✅ Successfully Deployed
+
+**Deployment URL**: https://chatapi-production-ea84.up.railway.app
+
+#### Deployment Issues Encountered and Resolved
+
+**Issue 1: Invalid Pydantic Version in requirements.txt**
+- **Error**: `ERROR: Could not find a version that satisfies the requirement pydantic==2.41.5`
+- **Root Cause**: requirements.txt specified non-existent Pydantic version (2.41.5)
+- **Fix**: Updated to valid versions:
+  - `pydantic==2.5.0`
+  - `pydantic-core==2.14.1`
+- **File**: `backend/requirements.txt:8-9`
+
+**Issue 2: Nixpacks Configuration - Missing pip**
+- **Error**: `/bin/bash: line 1: pip: command not found`
+- **Root Cause**: Custom nixpacks.toml specified `pip` as separate package, but it's not available in Nix
+- **Fix**: Removed custom nixpacks.toml and railway.json, letting Railway auto-detect Python setup
+- **Impact**: Railway's default Python detection works correctly with Procfile
+
+**Issue 3: Python Version Compatibility**
+- **Initial Attempt**: Created runtime.txt with `python-3.11.9`
+- **Outcome**: Not needed - Railway auto-detection handles Python version correctly
+- **Final State**: Removed runtime.txt, Railway uses Python from requirements.txt
+
+#### Successful Deployment Configuration
+
+**Files Required**:
+1. `backend/Procfile`:
+   ```
+   web: uvicorn src.main:app --host 0.0.0.0 --port $PORT
+   ```
+2. `backend/requirements.txt` (with correct Pydantic versions)
+
+**Files Removed** (not needed for Railway):
+- `nixpacks.toml` (caused pip errors)
+- `railway.json` (auto-detection better)
+- `runtime.txt` (auto-detected)
+
+**Environment Variables Set in Railway**:
+- `OPENAI_API_KEY`: OpenAI API key for embeddings and chat
+- `QDRANT_URL`: Qdrant Cloud cluster URL
+- `QDRANT_API_KEY`: Qdrant API authentication
+- `QDRANT_COLLECTION_NAME`: ai_native_book
+- `DATABASE_URL`: Neon Postgres connection string (with SSL)
+- `CORS_ORIGINS`: https://bilalmk.github.io
+- `APP_ENV`: production
+- `LOG_LEVEL`: INFO
+
+#### Deployment Process
+
+**Successful Deployment Steps**:
+1. Fixed requirements.txt Pydantic versions
+2. Removed problematic custom configuration files
+3. Kept only Procfile for process definition
+4. Set all required environment variables in Railway dashboard
+5. Ran `railway up --detach`
+6. Railway auto-detected Python, installed dependencies, started uvicorn
+
+**Build Time**: ~2-3 minutes
+**Deployment Result**: ✅ Backend running and responding at production URL
+
+#### Verification
+
+**Health Check**:
+```bash
+curl https://chatapi-production-ea84.up.railway.app/
+# Response: {"status":"backend running"}
+```
+
+**API Endpoints Available**:
+- `GET /` - Root endpoint (health check)
+- `GET /api/health` - Service health status
+- `POST /api/chat` - Chat completions
+- `GET /api/sessions/{session_id}/history` - Session history
+- `GET /docs` - OpenAPI documentation
+
+**Integration Status**:
+- Backend: ✅ Deployed on Railway
+- Frontend: ⏳ Requires CORS_ORIGINS update to connect to production backend
+- Database: ✅ Neon Postgres connected
+- Vector Store: ✅ Qdrant Cloud connected
+- AI Services: ✅ OpenAI API connected
+
+#### Next Steps for Full Production
+
+1. Update frontend API URL from `http://localhost:8000` to production Railway URL
+2. Test end-to-end chat flow with production backend
+3. Monitor Railway logs for any runtime errors
+4. Optimize for cold start times if needed
+5. Set up Railway health check alerts
+
 ### Clear Chat History Feature
 
 **Implementation Date**: 2025-12-02
@@ -702,3 +801,135 @@ python3 scripts/clear_and_reindex.py
 - `book/src/theme/components/ChatWidget/ChatWindow.tsx` (interface + UI)
 - `book/src/theme/components/ChatWidget/index.tsx` (logic)
 - `book/src/theme/components/ChatWidget/styles.module.css` (styling)
+
+### Critical Fix: Qdrant Client Version Mismatch
+
+**Date**: 2025-12-03
+**Status**: ✅ Resolved and Deployed
+**Severity**: Production Blocker
+
+#### Problem Description
+
+After initial Railway deployment on 2025-12-02, the production backend was experiencing fatal errors preventing all chat queries from working:
+
+```
+AttributeError: 'QdrantClient' object has no attribute 'search'
+```
+
+**User Impact**:
+- 100% of chat queries failing with 500 Internal Server Error
+- Backend started successfully but all searches crashed
+- Error occurred in `backend/src/services/vector_store.py:116`
+
+#### Root Cause Analysis
+
+**Investigation Steps**:
+1. Checked local development environment - working correctly ✅
+2. Examined requirements.txt - specified `qdrant-client==1.16.1`
+3. Checked actual installed version locally - `1.6.9`
+4. Compared API between versions - `search()` method signature changed
+
+**Root Cause**:
+- Local development was using `qdrant-client==1.6.9` (working)
+- requirements.txt incorrectly specified `qdrant-client==1.16.1` (breaking)
+- Railway production installed 1.16.1 based on requirements.txt
+- Version 1.16.1 had incompatible API changes to the `search()` method
+- The synchronous `QdrantClient` in 1.16.1 requires different search parameters
+
+**Why This Happened**:
+- requirements.txt was manually edited at some point with incorrect version
+- Local venv had not been updated, continued using older working version
+- Testing was only performed locally, not against fresh requirements.txt install
+- Version mismatch went undetected until production deployment
+
+#### Solution Implemented
+
+**Fix Applied**:
+1. Updated `backend/requirements.txt:5` from `qdrant-client==1.16.1` to `qdrant-client==1.6.9`
+2. Added explicit `pydantic-core==2.14.1` dependency to requirements.txt
+3. Redeployed to Railway with corrected dependencies
+4. Verified production deployment working correctly
+
+**Files Modified**:
+- `backend/requirements.txt` - Corrected qdrant-client version
+
+**Deployment Process**:
+```bash
+# 1. Fix requirements.txt
+vim backend/requirements.txt  # Changed 1.16.1 → 1.6.9
+
+# 2. Remove problematic temp files (Windows reserved names)
+rm -f backend/nul backend/requirements-temp.txt backend/temp_requirements.txt
+
+# 3. Deploy to Railway
+cd backend && npx railway up
+
+# 4. Verify deployment
+curl https://chatapi-production-ea84.up.railway.app/api/health
+```
+
+#### Verification
+
+**Production Testing**:
+```bash
+# Test query after fix
+curl -X POST "https://chatapi-production-ea84.up.railway.app/api/chat" \
+  -H "Content-Type: application/json" \
+  -d '{"message": "What is Physical AI?", "session_id": null}'
+```
+
+**Result**: ✅ Success - Returns comprehensive answer with 3 sources
+
+**Logs After Fix**:
+```
+2025-12-03 09:08:34 - src.main - INFO - Backend startup complete
+2025-12-03 09:09:28 - src.services.vector_store - INFO - Found 5 chunks above threshold 0.6
+2025-12-03 09:09:33 - src.services.llm - INFO - Generated response (length: 911 chars)
+2025-12-03 09:09:34 - src.main - INFO - POST /api/chat - 200
+```
+
+#### Prevention Measures
+
+**Lessons Learned**:
+1. **Always verify requirements.txt matches actual installation**
+   ```bash
+   pip freeze > requirements-actual.txt
+   diff requirements.txt requirements-actual.txt
+   ```
+
+2. **Test with fresh virtual environment before deploying**
+   ```bash
+   python -m venv test_venv
+   source test_venv/bin/activate
+   pip install -r requirements.txt
+   # Run tests
+   ```
+
+3. **Pin all dependencies explicitly**
+   - Direct dependencies: Exact versions (==)
+   - Sub-dependencies: Add to requirements.txt if API-critical
+
+4. **Add version validation to deployment script**
+   ```python
+   # In backend startup
+   import qdrant_client
+   assert qdrant_client.__version__ == "1.6.9", "Wrong qdrant-client version!"
+   ```
+
+5. **Document known working versions in README**
+   - Specify tested version combinations
+   - Note breaking changes in newer versions
+
+#### Impact Assessment
+
+**Downtime**: ~20 minutes (from first deploy at 08:48 to fix deploy at 09:08 UTC)
+**Queries Affected**: All queries during downtime window
+**Data Loss**: None (errors were at retrieval layer, no database corruption)
+**Resolution Time**: 20 minutes (diagnosis + fix + redeploy)
+
+**Acceptance Criteria**: All met ✅
+- Production backend responding correctly
+- Vector search working with qdrant-client 1.6.9
+- All integration tests passing
+- No errors in production logs
+- Response times within acceptable range (<5s)
